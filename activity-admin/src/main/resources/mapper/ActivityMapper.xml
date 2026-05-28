@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.activityConfig.mapper.ActivityMapper">
+
+    <resultMap id="ActivityMap" type="com.example.activityConfig.entity.Activity">
+        <id column="ID" property="id"/>
+        <result column="ACTIVITY_TYPE" property="activityType"/>
+        <result column="TITLE" property="title"/>
+        <result column="DESCRIPTION" property="description"/>
+        <result column="START_TIME" property="startTime"/>
+        <result column="END_TIME" property="endTime"/>
+        <result column="COVER_IMAGE" property="coverImage"/>
+        <result column="STATUS" property="status"/>
+        <result column="CREATED_BY" property="createdBy"/>
+        <result column="CREATED_TIME" property="createdTime"/>
+        <result column="UPDATED_TIME" property="updatedTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.activityConfig.entity.Activity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ACTIVITY (ACTIVITY_TYPE, TITLE, DESCRIPTION, START_TIME, END_TIME,
+            COVER_IMAGE, STATUS, CREATED_BY, CREATED_TIME, UPDATED_TIME)
+        VALUES (#{activityType}, #{title}, #{description}, #{startTime}, #{endTime},
+            #{coverImage}, #{status}, #{createdBy}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="com.example.activityConfig.entity.Activity">
+        UPDATE ACTIVITY SET
+            ACTIVITY_TYPE = #{activityType},
+            TITLE = #{title},
+            DESCRIPTION = #{description},
+            START_TIME = #{startTime},
+            END_TIME = #{endTime},
+            COVER_IMAGE = #{coverImage},
+            STATUS = #{status},
+            UPDATED_TIME = NOW()
+        WHERE ID = #{id}
+    </update>
+
+    <select id="findById" resultMap="ActivityMap">
+        SELECT * FROM ACTIVITY WHERE ID = #{id}
+    </select>
+
+    <select id="findByPage" resultMap="ActivityMap">
+        SELECT * FROM ACTIVITY
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND TITLE LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+        </where>
+        ORDER BY CREATED_TIME DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByPage" resultType="int">
+        SELECT COUNT(*) FROM ACTIVITY
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND TITLE LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>
